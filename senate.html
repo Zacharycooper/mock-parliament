@@ -177,8 +177,8 @@ let electorateData = {};
 let colourData    = {};
 
 Promise.all([
-  fetch('/senate.json').then(r => r.json()),
-  fetch('/colours.json')   .then(r => r.json())
+  fetch('/mock-parliament/senate.json').then(r => r.json()),
+  fetch('/mock-parliament/colours.json')   .then(r => r.json())
 ])
 .then(([sent, cols]) => {
   senateData = sent;
