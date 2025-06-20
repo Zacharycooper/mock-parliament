@@ -640,9 +640,9 @@ let electorateData = {};
 let colourData    = {};
 
 Promise.all([
-  fetch('/electorate.json').then(r => r.json()),
-  fetch('/colours.json').then(r => r.json()),
-  fetch('/margin.json').then(r => r.json())
+  fetch('/mock-parliament/electorate.json').then(r => r.json()),
+  fetch('/mock-parliament/colours.json').then(r => r.json()),
+  fetch('/mock-parliament/margin.json').then(r => r.json())
 ])
 .then(([elects, cols, marg]) => {
   electorateData = elects;
