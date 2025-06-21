@@ -116,6 +116,7 @@
       <a class="navbar-brand huninn-regular" href="index.html">Mock Parliament</a>
       <ul class="navbar-nav">
         <li class="nav-item"><a class="nav-link" href="senate.html">Senate Map</a></li>
+        <li class="nav-item"><a href="polls.html" class="nav-link">Polls</a></li>
       </ul>
     </div>
   </nav>
@@ -640,9 +641,9 @@ let electorateData = {};
 let colourData    = {};
 
 Promise.all([
-  fetch('/mock-parliament/electorate.json').then(r => r.json()),
-  fetch('/mock-parliament/colours.json').then(r => r.json()),
-  fetch('/mock-parliament/margin.json').then(r => r.json())
+  fetch('/electorate.json').then(r => r.json()),
+  fetch('/colours.json').then(r => r.json()),
+  fetch('/margin.json').then(r => r.json())
 ])
 .then(([elects, cols, marg]) => {
   electorateData = elects;
