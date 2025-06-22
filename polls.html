@@ -135,6 +135,10 @@
   <canvas id="pollChart" width="1000" height="500"></canvas>
   </div>
 <script>
+        //phone?
+    if(window.innerWidth <= 1000){
+      window.location.href='toosmall.html'
+    }
 
 const ctx = document.getElementById('pollChart').getContext('2d');
 
