@@ -1,383 +1,154 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Candidate Polling Graph</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet">
-</head>
-<body>
+  <!-- Optional zoom plugin -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script> -->
 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet">
   <style>
     body, html {
       margin: 0;
       padding: 0;
-      height: 100%;
       font-family: "Huninn", sans-serif;
-      align-items: center;
     }
 
     .navbar-brand {
       font-weight: 400;
     }
 
-    body {
-      display: flex;
-      flex-direction: column;
-    }
-    #fade{
-        align-items: center;
-        text-align: center;
-    }
-
     .content {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 20px;
-      padding: 0.5rem;
-      position: relative;
-    }
-
-    #slots {
+      padding: 1rem;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      min-width: 80px;
-    }
-
-    .slot {
-      color: white;
-      font-weight: 600;
-      font-size: 1.2rem;
-      text-align: center;
-      padding: 15px 0;
-      border-radius: 6px;
-      user-select: none;
-      width: 60px;
-    }
-
-
-    .slot1 { background: #e6194b; }
-    .slot2 { background: #3cb44b; }
-    .slot3 { background: #ffe119; color: #333; }
-    .slot4 { background: #4363d8; }
-    .slot5 { background: #f58231; }
-    .slot6 { background: #911eb4; }
-    .slot7 { background: #46f0f0; color: #333; }
-    .slot8 { background: #f032e6; }
-
-    #svg-container {
-      flex-shrink: 0;
-      width: 80vw;
-      max-width: 1000px;
-      height: 80vh;
-      display: flex;
-      justify-content: center;
       align-items: center;
+      gap: 1rem;
+    }
+
+    #chart-container {
+      width: 100%;
+      max-width: 1000px;
+      height: 400px;
       position: relative;
     }
 
-    svg {
-      width: 100%;
-      height: 100%;
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
     }
 
-    .tooltip {
-      position: absolute;
-      background: black;
-      color: white;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 14px;
-      pointer-events: none;
-      white-space: nowrap;
-      z-index: 1000;
-      display: none;
+    #fade {
+      text-align: center;
     }
 
-    @media (max-width: 1200px) {
-
-      #slots {
-        flex-direction: row;
-        width: 100%;
-        justify-content: center;
+    @media (max-width: 768px) {
+      #chart-container {
+        height: 300px;
       }
-      .slot {
-        flex: 1;
-        font-size: 1rem;
-        padding: 30 0;
-        width: 100px !important;
-      }
-      #svg-container {
-        width: 100vw;
-        height: 60vh;
-      }
-
     }
   </style>
-  <nav class="navbar navbar-light bg-light" style="width: 100%;">
+</head>
+<body>
+
+  <nav class="navbar navbar-light bg-light">
     <div class="container justify-content-center">
-      <a class="navbar-brand huninn-regular" href="index.html">Mock Parliament</a>
+      <a class="navbar-brand" href="index.html">Mock Parliament</a>
       <ul class="navbar-nav">
         <li class="nav-item"><a class="nav-link" href="senate.html">Senate Map</a></li>
         <li class="nav-item"><a class="nav-link" href="map.html">Lower House Map</a></li>
       </ul>
     </div>
   </nav>
-  
-<div id="fade" style="align-items: center !important;">
-  <h1 id="title" class="huninn-regular">Pre-Election</h1>
-  <button id="button" class="btn btn-info" onclick="swap()">Swap to post-election</button>
-  <canvas id="pollChart" width="1000" height="500"></canvas>
+
+  <div class="content" id="fade">
+    <h1 id="title">Pre-Election</h1>
+    <button id="button" class="btn btn-info" onclick="swap()">Swap to post-election</button>
+    <div id="chart-container">
+      <canvas id="pollChart"></canvas>
+    </div>
   </div>
-<script>
-        //phone?
-    if(window.innerWidth <= 1000){
-      window.location.href='toosmall.html'
-    }
 
-const ctx = document.getElementById('pollChart').getContext('2d');
+  <script>
+    const ctx = document.getElementById('pollChart').getContext('2d');
 
-const preData = {
-  labels: [
-    "5/22","5/23","5/28","5/30","6/1","6/3","6/5","6/7",
-    "6/10","6/12"
-  ],
-  datasets: [
-    {
-      label: "Dan",
-      data: [3,2,2,2,2,3,2,3,4,5,3],
-      borderColor: "#EA5D5D",
-      borderWidth: 3
-    },
-    {
-      label: "Stevens",
-      data: [19,17,20,23,24,21,22,20,17,16,20.6],
-      borderColor: "#74D8C4",
-      borderWidth: 3
-    },
-    {
-      label: "Adam",
-      data: [18,19,22,24,27,29,30,31,32,33,29.6],
-      borderColor: "#FAB700",
-      borderWidth: 3
-    },
-    {
-      label: "Ayaan",
-      data: [11,11,13,15,16,17,18,19,20,21,15.3],
-      borderColor: "#970EE1",
-      borderWidth: 3
-    },
-    {
-      label: "Marcus",
-      data: [14,16,11,7,5,5,5,5,6,7,7.8],
-      borderColor: "#35D232",
-      borderWidth: 3
-    },
-    {
-      label: "Cameron",
-      data: [2,2,2,1,1,2,2,2,1,0,1.9],
-      borderColor: "#5E5E5E",
-      borderWidth: 3
-    },
-    {
-      label: "Walsh",
-      data: [32,33,30,28,25,24,21,20,20,19,21.8],
-      borderColor: "#004CFF",
-      borderWidth: 3
-    },
-  ]
-};
-const postData = {
-  labels: [ 
-    "6/13","6/17","6/20","6/21","6/23"
-  ],
-  datasets: [
-    {
-      label: "Dan",
-      data: [3,3,2,2,2],
-      borderColor: "#EA5D5D",
-      borderWidth: 3
-    },
-    {
-      label: "Stevens",
-      data: [20.6,22,21,20,20],
-      borderColor: "#74D8C4",
-      borderWidth: 3
-    },
-    {
-      label: "Adam",
-      data: [29.6,30,29,30,31],
-      borderColor: "#FAB700",
-      borderWidth: 3
-    },
-    {
-      label: "Ayaan",
-      data: [15.3,15,15,17,18],
-      borderColor: "#970EE1",
-      borderWidth: 3
-    },
-    {
-      label: "Marcus",
-      data: [7.8,7,6,6,5],
-      borderColor: "#35D232",
-      borderWidth: 3
-    },
-    {
-      label: "Cameron",
-      data: [1.9,2,2,2,1],
-      borderColor: "#5E5E5E",
-      borderWidth: 3
-    },
-    {
-      label: "Walsh",
-      data: [21.8,21,21,20,21],
-      borderColor: "#004CFF",
-      borderWidth: 3
-    },
-    {
-      label: "Zac",
-      data: [0,0,4,4,2],
-      borderColor: "#6f00ff",
-      borderWidth: 3
-    }
-  ]
-};
+    const preData = {
+      labels: ["5/22", "5/23", "5/28", "5/30", "6/1", "6/3", "6/5", "6/7", "6/10", "6/12"],
+      datasets: [
+        { label: "Dan", data: [3,2,2,2,2,3,2,3,4,5,3], borderColor: "#EA5D5D", borderWidth: 3 },
+        { label: "Stevens", data: [19,17,20,23,24,21,22,20,17,16,20.6], borderColor: "#74D8C4", borderWidth: 3 },
+        { label: "Adam", data: [18,19,22,24,27,29,30,31,32,33,29.6], borderColor: "#FAB700", borderWidth: 3 },
+        { label: "Ayaan", data: [11,11,13,15,16,17,18,19,20,21,15.3], borderColor: "#970EE1", borderWidth: 3 },
+        { label: "Marcus", data: [14,16,11,7,5,5,5,5,6,7,7.8], borderColor: "#35D232", borderWidth: 3 },
+        { label: "Cameron", data: [2,2,2,1,1,2,2,2,1,0,1.9], borderColor: "#5E5E5E", borderWidth: 3 },
+        { label: "Walsh", data: [32,33,30,28,25,24,21,20,20,19,21.8], borderColor: "#004CFF", borderWidth: 3 }
+      ]
+    };
 
-let chart = new Chart(ctx, {
-  type: 'line',
-  data: preData,
-  options: {
-    responsive: false,
-    plugins: {
-      tooltip: {
-        enabled: true
-      },
-      legend: {
-        display: false
-      }
-    },
-    interaction: {
-      mode: 'nearest',
-      axis: 'x',
-      intersect: false
-    },
-    scales: {
-      y: {
-        title: {
-          display: true,
-          text: 'Percentage (%)'
+    const postData = {
+      labels: ["6/13", "6/17", "6/20", "6/21", "6/23"],
+      datasets: [
+        { label: "Dan", data: [3,3,2,2,2], borderColor: "#EA5D5D", borderWidth: 3 },
+        { label: "Stevens", data: [20.6,22,21,20,20], borderColor: "#74D8C4", borderWidth: 3 },
+        { label: "Adam", data: [29.6,30,29,30,31], borderColor: "#FAB700", borderWidth: 3 },
+        { label: "Ayaan", data: [15.3,15,15,17,18], borderColor: "#970EE1", borderWidth: 3 },
+        { label: "Marcus", data: [7.8,7,6,6,5], borderColor: "#35D232", borderWidth: 3 },
+        { label: "Cameron", data: [1.9,2,2,2,1], borderColor: "#5E5E5E", borderWidth: 3 },
+        { label: "Walsh", data: [21.8,21,21,20,21], borderColor: "#004CFF", borderWidth: 3 },
+        { label: "Zac", data: [0,0,4,4,2], borderColor: "#6f00ff", borderWidth: 3 }
+      ]
+    };
+
+    let chart = new Chart(ctx, {
+      type: 'line',
+      data: preData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          tooltip: { enabled: true },
+          legend: { display: false }
         },
-        beginAtZero: true
-      },
-      x: {
-        title: {
-          display: true,
-          text: 'Date'
+        interaction: { mode: 'nearest', axis: 'x', intersect: false },
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: 'Percentage (%)' } },
+          x: { title: { display: true, text: 'Date' } }
         }
       }
-    }
-  }
-});
+    });
 
+    function swap() {
+      const button = document.getElementById('button');
+      const title = document.getElementById('title');
+      chart.destroy();
 
-function swap() {
-  const button = document.getElementById('button');
-  const fade = document.getElementById('fade');
-  const title = document.getElementById('title');
-
-  chart.destroy()
-
-  if (button.classList.contains('btn-info')) {
-    button.classList.remove('btn-info');
-    button.classList.add('btn-primary');
-    button.textContent = 'Swap to pre-election';
-    title.textContent = 'Post-Election';
-
-    chart = new Chart(ctx, {
-  type: 'line',
-  data: postData,
-  options: {
-    responsive: false,
-    plugins: {
-      tooltip: {
-        enabled: true
-      },
-      legend: {
-        display: false
-      }
-    },
-    interaction: {
-      mode: 'nearest',
-      axis: 'x',
-      intersect: false
-    },
-    scales: {
-      y: {
-        title: {
-          display: true,
-          text: 'Percentage (%)'
-        },
-        beginAtZero: true
-      },
-      x: {
-        title: {
-          display: true,
-          text: 'Date'
+      const isPre = button.classList.contains('btn-info');
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: isPre ? postData : preData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltip: { enabled: true },
+            legend: { display: false }
+          },
+          interaction: { mode: 'nearest', axis: 'x', intersect: false },
+          scales: {
+            y: { beginAtZero: true, title: { display: true, text: 'Percentage (%)' } },
+            x: { title: { display: true, text: 'Date' } }
+          }
         }
-      }
+      });
+
+      button.classList.toggle('btn-info');
+      button.classList.toggle('btn-primary');
+      button.textContent = isPre ? 'Swap to pre-election' : 'Swap to post-election';
+      title.textContent = isPre ? 'Post-Election' : 'Pre-Election';
     }
-  }
-});
-
-  } else {
-    button.classList.remove('btn-primary');
-    button.classList.add('btn-info');
-    title.textContent = 'Pre-Election';
-    button.textContent = 'Swap to post-election';
-    chart = new Chart(ctx, {
-  type: 'line',
-  data: preData,
-  options: {
-    responsive: false,
-    plugins: {
-      tooltip: {
-        enabled: true
-      },
-      legend: {
-        display: false
-      }
-    },
-    interaction: {
-      mode: 'nearest',
-      axis: 'x',
-      intersect: false
-    },
-    scales: {
-      y: {
-        title: {
-          display: true,
-          text: 'Percentage (%)'
-        },
-        beginAtZero: true
-      },
-      x: {
-        title: {
-          display: true,
-          text: 'Date'
-        }
-      }
-    }
-  }
-});
-
-  }
-}
-
-</script>
+  </script>
 </body>
 </html>
