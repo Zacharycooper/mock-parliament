@@ -59,22 +59,19 @@
     .slot6 { background: #911eb4; }
     .slot7 { background: #46f0f0; color: #333; }
     .slot8 { background: #f032e6; }
+#svg-container {
+  width: 100%;
+  max-width: 1000px;
+  aspect-ratio: 3 / 2;
+  padding: 0 1rem;
+  overflow-x: auto;
+}
 
-    #svg-container {
-      flex-shrink: 0;
-      width: 80vw;
-      max-width: 1000px;
-      height: 80vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-    }
-
-    svg {
-      width: 100%;
-      height: 100%;
-    }
+svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
 
     .tooltip {
       position: absolute;
@@ -119,16 +116,7 @@
   </nav>
 
   <div class="content">
-    <div id="slots">
-      <div class="slot slot1" style="background-color: #EA5D5D; width: 120px !important;">Dan Carroll</div>
-      <div class="slot slot2" style="background-color: #FAB700; width: 120px !important;">Adam Sheridan</div>
-      <div class="slot slot3" style="background-color: #35D232; width: 120px !important;">Marcus McGloughlin</div>
-      <div class="slot slot4" style="background-color: #004CFF; width: 120px !important;">William Walsh</div>
-      <div class="slot slot5" style="background-color: #74D8C4; width: 120px !important;">Will Stevens</div>
-      <div class="slot slot6" style="background-color: #970EE1; width: 120px !important;">Ayaan Gupta</div>
-      <div class="slot slot7" style="background-color: #5E5E5E; width: 120px !important;">Cameron Leighton</div>
-      <div class="slot slot8" style="background-color: #6f00ff; width: 120px !important;">Zac Cooper</div>
-    </div>
+
 
     <div id="svg-container">
 <svg type="senate" id="map" title="Australian Senate" auto-border-stroke-width="5" auto-border-stroke-width-limit=".5" version="1.1" default-mode="split" candidates="[{&quot;id&quot;:&quot;f4bcbcc9-ad83-4ca5-b2b5-09f06a5b5002&quot;,&quot;name&quot;:&quot;Ayaan&quot;,&quot;defaultCount&quot;:0,&quot;margins&quot;:[{&quot;color&quot;:&quot;#970ee1&quot;}]},{&quot;id&quot;:&quot;d1fdb22a-0253-4865-9235-269f6ca44b83&quot;,&quot;name&quot;:&quot;Adam&quot;,&quot;defaultCount&quot;:0,&quot;margins&quot;:[{&quot;color&quot;:&quot;#fab700&quot;}]},{&quot;id&quot;:&quot;920ab95f-1b89-4324-aa38-f5a532460ea9&quot;,&quot;name&quot;:&quot;Cameron&quot;,&quot;defaultCount&quot;:0,&quot;margins&quot;:[{&quot;color&quot;:&quot;#5e5e5e&quot;}]},{&quot;id&quot;:&quot;03afce10-8cc9-492c-a6a3-9e367ed7e405&quot;,&quot;name&quot;:&quot;Marcus&quot;,&quot;defaultCount&quot;:0,&quot;margins&quot;:[{&quot;color&quot;:&quot;#35d232&quot;}]},{&quot;id&quot;:&quot;edfd8f1f-bce3-44ca-aecf-8d444bd11d76&quot;,&quot;name&quot;:&quot;Will Stevens&quot;,&quot;defaultCount&quot;:0,&quot;margins&quot;:[{&quot;color&quot;:&quot;#74d8c4&quot;}]},{&quot;id&quot;:&quot;d5902643-8e05-4fc7-a1fe-058297378d32&quot;,&quot;name&quot;:&quot;Dan&quot;,&quot;defaultCount&quot;:0,&quot;margins&quot;:[{&quot;color&quot;:&quot;#ea5d5d&quot;}]},{&quot;id&quot;:&quot;5fd50e11-6dba-4543-89c0-0798bd2b4f13&quot;,&quot;name&quot;:&quot;Will Walsh&quot;,&quot;defaultCount&quot;:0,&quot;margins&quot;:[{&quot;color&quot;:&quot;#004cff&quot;}]}]" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 573 554" style="--auto-border-stroke-width: 0.5px; --region-stroke-color: var(--color-base-100); transform: scale(1); transform-origin: center;" tossup-candidate="{&quot;id&quot;:&quot;&quot;,&quot;name&quot;:&quot;Tossup&quot;,&quot;defaultCount&quot;:0,&quot;margins&quot;:[{&quot;color&quot;:&quot;#cccccc&quot;}]}">
@@ -165,9 +153,9 @@
   </div>
 
   <script>
-    //phone?
-    if(window.innerWidth <= 1000){
-      window.location.href='toosmall.html'
+    let mobileornah = 0
+        if(window.innerWidth <= 1000){
+          mobileornah = 1
     }
 
 
@@ -233,8 +221,37 @@ function initMapHover() {
   });
 
   svg.addEventListener('mouseout', () => {
+    if(mobileornah != 1){
     popup.style.display = 'none';
+    }
   });
+
+document.querySelectorAll('svg [region]').forEach(el => {
+  el.addEventListener('touchstart', e => {
+    const id = e.target.id;
+    if (!id || !senateData[id]) return;
+    const splitting = senateData[id]
+    const [owner, split1] = splitting.split(']')
+    const people = split1.split('|')
+    let party = [];
+    let amount = [];
+    for (let i = 0; i < people.length; i++){
+      const [ogparty, ogamount] = people[i].split(',')
+      party.push(ogparty)
+      amount.push(ogamount)
+    }
+
+    let message = ''
+
+    for (let i = 0; i < party.length; i++){
+      message = message + `<br>${party[i]} : ${amount[i]}`
+    }
+
+    popup.innerHTML = `<b>${id}</b>${message}`;
+    popup.style.borderColor = colourData[owner] || '#000';
+    popup.style.display = 'block';
+  });
+});
 }
 
 
