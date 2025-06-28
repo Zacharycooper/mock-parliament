@@ -30,6 +30,10 @@ window.submit = async function() {
     const message = document.getElementById('statement').value
     const title = document.getElementById('title').value;
     const reference = document.getElementById('kind').value;
+    if(message == '' || title == ''){
+        document.getElementById('fail').innerHTML = "Please fill all the boxes."
+        return
+    }
     let password = await getData(party)
     if(password == insertP){
         await writeUserData(message, title, reference, party)
