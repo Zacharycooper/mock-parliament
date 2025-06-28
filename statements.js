@@ -1,4 +1,4 @@
-  import { getDatabase, ref, child, get, set, update } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+  import { getDatabase, ref, child, get, update, remove } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
@@ -48,6 +48,7 @@ window.screen = async function(){
       let options = ``
   const rf = ref(db);
     if(submit == 0){
+      if(localStorage.getItem('nerd')){
     document.getElementById('addsubmithere').innerHTML = `  <div id="submit" class="card p-4 shadow-sm">
     <h4 class="mb-3">Submit a Statement</h4>
 
@@ -88,7 +89,51 @@ window.screen = async function(){
 
     <button class="btn btn-success" onclick="submit()">Submit</button>
     <p id="fail" class="text-danger mt-2"></p>
+    <hr>
+    <button class="btn btn-primary" onclick="references()">Edit References</button>
   </div>`
+      }else{
+    document.getElementById('addsubmithere').innerHTML = `  <div id="submit" class="card p-4 shadow-sm">
+    <h4 class="mb-3">Submit a Statement</h4>
+
+    <div class="mb-3">
+      <label class="form-label">Select Party</label>
+      <select class="form-select" id="party">
+        <option value="Adam">Adam Sheridan</option>
+        <option value="Dan">Dan Carroll</option>
+        <option value="Marcus">Marcus McGloughlin</option>
+        <option value="Cameron">Cameron Leighton</option>
+        <option value="Walsh">Will Walsh</option>
+        <option value="Stevens">Will Stevens</option>
+        <option value="Ayaan">Ayaan Gupta</option>
+        <option value="Zac">Zachary Cooper</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Party-specific PIN</label>
+      <input type="password" id="pin" class="form-control" minlength="6" maxlength="6">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Statement Context</label>
+      <select class="form-select" id="kind">
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Title</label>
+      <input type="text" id="title" class="form-control">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Statement</label>
+      <textarea id="statement" class="form-control" rows="3"></textarea>
+    </div>
+
+    <button class="btn btn-success" onclick="submit()">Submit</button>
+    <p id="fail" class="text-danger mt-2"></p>
+  </div>`}
   document.getElementById('coolsubmitthing').innerHTML = 'Cancel submit'
   document.getElementById('coolsubmitthing').classList.toggle('btn-primary');
   document.getElementById('coolsubmitthing').classList.toggle('btn-danger');
@@ -111,6 +156,99 @@ submit = 1
   document.getElementById('coolsubmitthing').classList.toggle('btn-danger');
   submit = 0
 }
+}
+window.references = async function(){
+        const db = await getDatabase();
+      let options = ``
+  const rf = ref(db);
+  document.getElementById('addsubmithere').innerHTML = `  <div id="submit" class="card p-4 shadow-sm">
+    <div class="mb-3">
+      <label class="form-label">Delete a reference</label>
+      <select class="form-select" id="deletekind">
+      </select>
+    </div>
+    <button class="btn btn-danger" onclick="deleteRef()">Delete reference</button>
+    <p id="fail" class="text-danger mt-2"></p>
+    <hr>
+      <div class="mb-3">
+      <label class="form-label">Add a reference</label>
+      <input type="text" id="referenceadd" class="form-control" >
+    </div>
+    <button class="btn btn-success" onclick="addRef()">Add reference</button>
+  </div>`
+
+    await get(child(rf, `reference/amount`)).then(async (snapshot) => {
+    if (snapshot.exists()) {
+        const value = snapshot.val();
+        for(let i = 1; i <= value; i++){
+              await get(child(rf, `reference/no${i}`)).then(async (snapshot) => {
+            options += `<option value="${snapshot.val()}">${snapshot.val()}</option>`
+              })
+        }
+        document.getElementById('deletekind').innerHTML = options;
+    }
+})
+}
+
+window.deleteRef = async function(){
+  const db = getDatabase();
+  const rf = ref(db);
+  const todelete = document.getElementById('deletekind').value.toLowerCase();
+
+  if(todelete === 'general statement'){
+    document.getElementById('fail').innerHTML = `You can't delete the "General Statement"`;
+    return;
+  }
+
+  await remove(ref(db, `reference/${todelete}`));
+
+  const amountSnap = await get(child(rf, `reference/amount`));
+  if (!amountSnap.exists()) return;
+
+  let amount = amountSnap.val();
+  let foundIndex = -1;
+
+  for (let i = 1; i <= amount; i++) {
+    const snap = await get(child(rf, `reference/no${i}`));
+    if (snap.exists() && snap.val().toLowerCase() === todelete) {
+      foundIndex = i;
+      await remove(ref(db, `reference/no${i}`));
+      break;
+    }
+  }
+
+  for (let i = foundIndex + 1; i <= amount; i++) {
+    const nextSnap = await get(child(rf, `reference/no${i}`));
+    if (nextSnap.exists()) {
+      const nextValue = nextSnap.val();
+      await update(ref(db), {
+        [`reference/no${i - 1}`]: nextValue
+      });
+      await remove(ref(db, `reference/no${i}`));
+    }
+  }
+
+  await update(ref(db), {
+    'reference/amount': amount - 1
+  });
+  location.reload()
+}
+
+window.addRef = async function() {
+  const db = getDatabase();
+  const rf = ref(db);
+  const toadd = document.getElementById('referenceadd').value;
+
+  const snapshot = await get(child(rf, `reference/amount`));
+  let amount = snapshot.exists() ? snapshot.val() : 0;
+  amount += 1;
+
+  await update(ref(db), {
+    [`reference/amount`]: amount,
+    [`reference/no${amount}`]: toadd
+  });
+
+  location.reload();
 }
 
 
@@ -178,8 +316,10 @@ async function loaddata() {
   const db = await getDatabase();
   const rf = ref(db);
   const currentDate = new Date();
+  const nerd = localStorage.getItem("nerd");
   let output = '';
 
+  if(!nerd){
   for (let i = 0; i < 7; i++) {
     const dateObj = new Date(currentDate);
     dateObj.setDate(currentDate.getDate() - i);
@@ -213,11 +353,17 @@ async function loaddata() {
         }else if(entry.party == "Ayaan"){
             party = "Ayaan Gupta Party"
         }
+        let ai = '<p class="badge bg-danger text-wrap">This statement has not been put in the ai.</p>'
+        if(entry.hasbeenai == true){
+        ai = '<p class="badge bg-success text-wrap">This statement has been put into the ai.</p>'
+        }
         output += `
           <p>${party}</p>
           <h3>${key}</h3>
           <p>${entry.reference}</p>
-          <p>${entry.statement}</p><hr>
+          <p>${entry.statement}</p>
+          ${ai}
+          <hr>
         `;
       }
     }
@@ -228,6 +374,91 @@ async function loaddata() {
   }else{
   document.getElementById('statements').innerHTML = output;
   }
+}else{
+    for (let i = 0; i < 7; i++) {
+    const dateObj = new Date(currentDate);
+    dateObj.setDate(currentDate.getDate() - i);
+    const day = dateObj.getDate();
+    const month = dateObj.getMonth();
+
+    const snapshot = await get(child(rf, `statements/${month}-${day}`));
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      output += `<h1>${day}/${month + 1}</h1><hr>`;
+
+
+      for (const key in data) {
+        if (key === "amount") continue;
+        let party = null
+        const entry = data[key];
+        if(entry.party == "Zac"){
+            party = "Zachary Cooper Party"
+        }else if(entry.party == "Adam"){
+            party = "Adam Sheridan Party"
+        }else if(entry.party == "Dan"){
+            party = "Dan Carroll Party"
+        }else if(entry.party == "Marcus"){
+            party = "Marcus McGloughlin Party"
+        }else if(entry.party == "Cameron"){
+            party = "Cameron Leighton Party"
+        }else if(entry.party == "Walsh"){
+            party = "William Walsh party"
+        }else if(entry.party == "Stevens"){
+            party = "William Stevens Party"
+        }else if(entry.party == "Ayaan"){
+            party = "Ayaan Gupta Party"
+        }
+        let button = ''
+        if(entry.hasbeenai == false){
+          button = `<button class='btn btn-success' onclick='doai("${key}", ${month}, ${day})'>Mark as Ai'd</button>`
+        }else{
+           button = `<button class='btn btn-warning' onclick='noai("${key}", ${month}, ${day})'>Remove Ai'd</button>`
+        }
+        output += `
+          <p>${party}</p>
+          <h3>${key}</h3>
+          <p>${entry.reference}</p>
+          <p>${entry.statement}</p>
+          ${button}
+          <hr>
+        `;
+      }
+    }
+  }
+
+  if(output == ''){
+  document.getElementById('statements').innerHTML = 'Would You look at that! No statements within the last 7 days...';
+  }else{
+  document.getElementById('statements').innerHTML = output;
+  }
+}
+}
+
+window.doai = async function(title, month, day) {
+    const db = getDatabase();
+try {
+await update(ref(db), {
+  [`statements/${month}-${day}/${title}/hasbeenai`]: true
+});
+} catch (err) {
+  console.error("Update error:", err);
+}
+location.reload();
+}
+window.noai = async function(title, month, day) {
+    const db = getDatabase();
+try {
+await update(ref(db), {
+  [`statements/${month}-${day}/${title}/hasbeenai`]: false
+});
+} catch (err) {
+  console.error("Update error:", err);
+}
+location.reload();
+}
+
+if(localStorage.getItem('nerd')){
+  document.getElementById('coolsubmitthing').innerHTML = 'Submit Statement | Edit References'
 }
 
 loaddata()
