@@ -189,7 +189,7 @@ async function loaddata() {
     const snapshot = await get(child(rf, `statements/${month}-${day}`));
     if (snapshot.exists()) {
       const data = snapshot.val();
-      output += `<h1>${month + 1}/${day}</h1><hr>`;
+      output += `<h1>${day}/${month + 1}</h1><hr>`;
 
 
       for (const key in data) {
