@@ -469,10 +469,11 @@ if(window.location.pathname.endsWith("statements.html")){
         }
         let button = ''
         if(entry.hasbeenai == false){
-          button = `<button class='btn btn-success' onclick='doai("${key}", ${month}, ${day})'>Mark as Ai'd</button>`
+            button = `<button class='btn btn-success' onclick=\`doai("${key}", ${month}, ${day})\`>Mark as Ai'd</button>`
         }else{
-           button = `<button class='btn btn-warning' onclick='noai("${key}", ${month}, ${day})'>Remove Ai'd</button>`
+           button = `<button class='btn btn-warning' onclick=\`noai("${key}", ${month}, ${day})\`>Remove Ai'd</button>`
         }
+        console.log(key)
         output += `
           <p>${party}</p>
           <h3>${key}</h3>
