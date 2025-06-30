@@ -521,8 +521,13 @@ for (let i = 0; i < 21; i++) {
     const data = snapshot.val();
     const divId = `${dateCode}`;
     let deleteBtn = '';
+    const keys = Object.keys(data)
+  .filter(k => k !== 'amount')
+  .map(Number)
+  .sort((a, b) => b - a);
+
           let i = 1;
-      for (const key in data) {
+      for (const key of keys) {
         if (key === "amount") continue;
         const entry = data[key];
         const content = entry
