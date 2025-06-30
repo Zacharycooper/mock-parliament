@@ -68,6 +68,7 @@
         <li class="nav-item"><a class="nav-link" href="map.html">House of Representatives</a></li>
         <li class="nav-item"><a class="nav-link" href="senate.html">Senate</a></li>
         <li class="nav-item"><a class="nav-link" href="polls.html">Polls</a></li>
+        <li class="nav-item"><a href="statementResponses.html" class="nav-link">Statement Responses</a></li>
       </ul>
     </div>
   </nav>
@@ -99,6 +100,10 @@ function antinerd(){
 localStorage.removeItem('nerd')
     location.reload()
 }
+if(localStorage.getItem('nerd')){
+  document.getElementById('coolsubmitthing').innerHTML = 'Submit Statement | Edit References'
+}
+
 </script>
 
 <script type="module" src="statements.js"></script>
