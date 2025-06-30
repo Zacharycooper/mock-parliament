@@ -111,6 +111,7 @@ svg {
         <li class="nav-item"><a class="nav-link" href="map.html">House of Representatives</a></li>
         <li class="nav-item"><a href="polls.html" class="nav-link">Polls</a></li>
         <li class="nav-item"><a class="nav-link" href="statements.html">Statements</a></li>
+        <li class="nav-item"><a href="statementResponses.html" class="nav-link">Statement Responses</a></li>
       </ul>
     </div>
   </nav>
@@ -211,7 +212,7 @@ function initMapHover() {
   });
 
   svg.addEventListener('mousemove', e => {
-    if(e.clientY >= 700){
+    if(e.clientY >= window.innerHeight * 0.5){
     popup.style.left = `${e.clientX - 70}px`;
     popup.style.top  = `${e.clientY - 185}px`;
     }else{
