@@ -176,7 +176,7 @@ window.uploadScreen = async function(){
 }
 
 window.prompt = async function(){
-fetch('mock-parliament/prompt.txt')
+fetch('prompt.txt')
   .then(res => res.text())
   .then(text => navigator.clipboard.writeText(text));
 document.getElementById('success').innerHTML = 'Copied! Just paste this into chatgpt directly after the most recent POLLS.'
@@ -291,12 +291,19 @@ function getData(data) {
   });
 }
 
-async function writeUserData(message, title, reference, party) {
+async function writeUserData(message, title, oldReference, party) {
     const db = getDatabase();
     const rf = ref(db);
     const currentDate = new Date();
     const day = currentDate.getDate();
     const month = currentDate.getMonth();
+    let reference = ''
+if (oldReference.includes('(')) {
+  reference = oldReference.replace(/\s*\(.*?\)/, "");
+}else{
+  reference = oldReference
+}
+
     await get(child(rf, `statements/${month}-${day}/amount`)).then(async (snapshot) => {
     if (!snapshot.exists()) {
          get(child(rf, `statements/amount`)).then(async (snapshot) => {
@@ -490,7 +497,7 @@ const currentDate = new Date();
 const nerd = localStorage.getItem("nerd");
 let output = '';
 
-for (let i = 0; i < 7; i++) {
+for (let i = 0; i < 21; i++) {
   const dateObj = new Date(currentDate);
   dateObj.setDate(currentDate.getDate() - i);
   const day = dateObj.getDate();
@@ -512,7 +519,7 @@ for (let i = 0; i < 7; i++) {
 }
 
 if (!output) {
-  output = 'Would You look at that! No responses within the last 7 days...';
+  output = 'Would You look at that! No responses within the last 21 days...';
 }
 
 document.getElementById('statements').innerHTML = output;
