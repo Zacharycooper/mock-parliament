@@ -402,8 +402,13 @@ if(window.location.pathname.endsWith("statements.html")){
         }
         let ai = '<p class="badge bg-danger text-wrap">This statement has not been put in the ai.</p>'
         if(entry.hasbeenai == true){
-        ai = '<p class="badge bg-success text-wrap">This statement has been put into the ai.</p>'
-        }
+        const snapshot = await get(child(rf, `statements/${month}-${day}/${key}/dateai`));
+      if (snapshot.exists()) {
+        const when = snapshot.val()
+        const link = when.replace('/','')
+        ai = `<p class="badge bg-success text-wrap">This statement was put into the ai on <b><a href='statementResponses.html#${link}' style='color: white'>${when}</a></b>.</p>`
+      }  
+      }
         output += `
           <p>${party}</p>
           <h3>${key}</h3>
@@ -532,16 +537,21 @@ window.deleteRes = async function(id){
 }
 
 window.doai = async function(title, month, day) {
+    const dateObj = new Date();
+  const day2 = dateObj.getDate();
+  const month2 = dateObj.getMonth() + 1;
     const db = getDatabase();
 try {
 await update(ref(db), {
-  [`statements/${month}-${day}/${title}/hasbeenai`]: true
+  [`statements/${month}-${day}/${title}/hasbeenai`]: true,
+  [`statements/${month}-${day}/${title}/dateai`]: `${day2.toString()}/${month2.toString()}`
 });
 } catch (err) {
   console.error("Update error:", err);
 }
 location.reload();
 }
+
 window.noai = async function(title, month, day) {
     const db = getDatabase();
 try {
