@@ -291,7 +291,7 @@ function getData(data) {
   });
 }
 
-async function writeUserData(message, title, oldReference, party) {
+async function writeUserData(message, title2, oldReference, party) {
     const db = getDatabase();
     const rf = ref(db);
     const currentDate = new Date();
@@ -303,6 +303,7 @@ if (oldReference.includes('(')) {
 }else{
   reference = oldReference
 }
+const title = escapeHtml(title2)
 
     await get(child(rf, `statements/${month}-${day}/amount`)).then(async (snapshot) => {
     if (!snapshot.exists()) {
@@ -362,6 +363,14 @@ window.responseSubmit = async function() {
     console.error(err);
   }
   location.reload()
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, "")
+            .replace(/"/g, "")
+            .replace(/'/g, "")
+            .replace(/</g, "")
+            .replace(/>/g, "");
 }
 
 
@@ -469,9 +478,9 @@ if(window.location.pathname.endsWith("statements.html")){
         }
         let button = ''
         if(entry.hasbeenai == false){
-            button = `<button class='btn btn-success' onclick=\`doai("${key}", ${month}, ${day})\`>Mark as Ai'd</button>`
+          button = `<button class='btn btn-success' onclick="doai('${key}', ${month}, ${day})">Mark as Ai'd</button>`
         }else{
-           button = `<button class='btn btn-warning' onclick=\`noai("${key}", ${month}, ${day})\`>Remove Ai'd</button>`
+            button = `<button class='btn btn-warning' onclick="noai('${key}', ${month}, ${day})">Remove Ai'd</button>`
         }
         console.log(key)
         output += `
