@@ -352,13 +352,16 @@ window.responseSubmit = async function() {
   const date = `${now.getDate()}${now.getMonth() + 1}`;
 
   const amtRef = child(rf, `response/amount`);
-  const dateRef = child(rf, `response/${date}`);
+  const amtRef2 = child(rf, `response/${date}/amount`);
 
   try {
     const amtSnap = await get(amtRef);
     const newAmount = amtSnap.exists() ? amtSnap.val() + 1 : 1;
+    const amtSnap2 = await get(amtRef2);
+    const newAmount2 = amtSnap2.exists() ? amtSnap2.val() + 1 : 1;
     await update(ref(db), { "response/amount": newAmount });
-    await update(ref(db), { [`response/${date}`]: variable });
+    await update(ref(db), { [`response/${date}/amount`]: newAmount2});
+    await update(ref(db), { [`response/${date}/${newAmount2}`]: variable });
   } catch (err) {
     console.error(err);
   }
@@ -422,7 +425,7 @@ if(window.location.pathname.endsWith("statements.html")){
       if (snapshot.exists()) {
         const when = snapshot.val()
         const link = when.replace('/','')
-        ai = `<p class="badge bg-success text-wrap">This statement was put into the ai on <b><a href='statementResponses.html#${link}' style='color: white'>${when}</a></b>.</p>`
+        ai = `<p class="badge bg-success text-wrap">This statement was put into the ai on <b>${when}</b>.</p>`
       }  
       }
         output += `
@@ -482,7 +485,6 @@ if(window.location.pathname.endsWith("statements.html")){
         }else{
             button = `<button class='btn btn-warning' onclick="noai('${key}', ${month}, ${day})">Remove Ai'd</button>`
         }
-        console.log(key)
         output += `
           <p>${party}</p>
           <h3>${key}</h3>
@@ -516,16 +518,22 @@ for (let i = 0; i < 21; i++) {
   const snapshot = await get(child(rf, `response/${dateCode}`));
 
   if (snapshot.exists()) {
-    const content = snapshot.val();
+    const data = snapshot.val();
     const divId = `${dateCode}`;
     let deleteBtn = '';
-
+          let i = 1;
+      for (const key in data) {
+        if (key === "amount") continue;
+        const entry = data[key];
+        const content = entry
     if (nerd) {
-      deleteBtn = `<button class='btn btn-danger d-flex justify-content-center mb-3' onclick="deleteRes('${divId}')">Delete Response</button>`;
+      deleteBtn = `<button class='btn btn-danger d-flex justify-content-center mb-3' onclick="deleteRes('${divId}','${key}')">Delete Response</button>`;
     }
+    output += `<div id="${divId}-${key}">${content}${deleteBtn}</div><hr>`;
 
-    output += `<div id="${divId}">${content}${deleteBtn}</div><hr>`;
-  }
+    i++;
+      
+  }}
 }
 
 if (!output) {
@@ -539,17 +547,25 @@ document.getElementById('statements').innerHTML = output;
 }
 }
 
-window.deleteRes = async function(id){
+window.deleteRes = async function(id, key){
     const db = await getDatabase();
   const rf = ref(db);
-      const snapshot = await get(child(rf, `response/amount`));
+      const snapshot = await get(child(rf, `response/${id}/amount`));
     if (snapshot.exists()) {
       let value = snapshot.val()
+      if(value - 1 == 0){
+        await remove(ref(db, `response/${id}`))
+        const snapshot = await get(child(rf, `response/amount`));
+        let value2 = snapshot.val()
         await update(ref(db), {
-  [`response/amount`]: value - 1
+  [`response/amount`]: value2 - 1})
+      }else{
+        await update(ref(db), {
+  [`response/${id}/amount`]: value - 1
 });
-  await remove(ref(db, `response/${id}`));
+  await remove(ref(db, `response/${id}/${key}`));
     }
+  }
     location.reload()
 }
 
@@ -583,5 +599,4 @@ location.reload();
 
 
 loaddata()
-
 
