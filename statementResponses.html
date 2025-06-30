@@ -103,6 +103,31 @@ localStorage.removeItem('nerd')
 if(localStorage.getItem('nerd')){
     document.getElementById('nerdyayaan').innerHTML = `<button class="btn btn-info mb-3" id="cooluploadthing" onclick="uploadScreen()">Submit Response</button>`
 }
+function adjustDatePosition() {
+  document.querySelectorAll('#statements .date').forEach(dateEl => {
+    if (window.innerWidth < 1000) {
+      dateEl.style.position = 'static';
+      dateEl.style.display = 'block';
+      dateEl.style.textAlign = 'center';
+      dateEl.style.marginTop = '-10px';
+      dateEl.style.marginBottom = '10px';
+    } else {
+      dateEl.style.position = 'absolute';
+      dateEl.style.top = '20px';
+      dateEl.style.right = '20px';
+      dateEl.style.textAlign = '';
+      dateEl.style.marginTop = '';
+      dateEl.style.marginBottom = '';
+    }
+  });
+}
+
+window.addEventListener('resize', adjustDatePosition);
+window.addEventListener('load', adjustDatePosition);
+
+const observer = new MutationObserver(adjustDatePosition);
+observer.observe(document.getElementById('statements'), { childList: true, subtree: true });
+
 </script>
 
 <script type="module" src="statements.js"></script>
