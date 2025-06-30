@@ -1,0 +1,76 @@
+Can you please turn this into a html <div> tag to go onto a website? for the div id, make sure its {date}{month}. So if its the 30/6, do "". Make it simillar to how this div tag is set out, and update the date:   <div id="306" style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; position: relative;">
+  <div style="position: absolute; top: 20px; right: 20px; font-size: 14px; color: #555;">
+    May 12, 2023
+  </div>
+  <h2>EU-Australia Free Trade Negotiation Update</h2>
+  <h3>EU Response</h3>
+  <p>The European Union responded positively to Prime Minister Adam Sheridan’s proposal, praising his diplomatic tone and flexibility. However, they did not accept the deal outright, instead requesting additional conditions before progressing to finalization.</p>
+  <h4>Accepted:</h4>
+  <ul>
+    <li>Removal of ISDS in favor of domestic courts.</li>
+    <li>Climate and environmental regulation safeguards.</li>
+  </ul>
+  <h4>Further Conditions Requested:</h4>
+  <ul>
+    <li><strong>Agricultural Quotas:</strong> Limit on specific Australian exports like beef and dairy.</li>
+    <li><strong>Labour Standards:</strong> Goods must comply with EU-aligned labor standards.</li>
+    <li><strong>Cultural Protections:</strong> Safeguards for EU media and cultural industries.</li>
+    <li><strong>Pharmaceuticals & Data:</strong> Mutual recognition for medical goods and digital privacy protections.</li>
+  </ul>
+  <p>The EU and Australia agree to advance negotiations with a draft framework, marking a historic step in their economic relationship.</p>
+  <hr>
+  <h3>Political Impact in Australia</h3>
+  <p>Sheridan’s high-profile diplomatic effort boosts his public image. His speech in the EU Parliament and the collaborative negotiation process improve perceptions of competence and leadership. Gupta benefits slightly as Minister for Industry. Other figures see minimal or negative movement.</p>
+  <h4>📊 Updated Polls</h4>
+  <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+    <thead>
+      <tr style="background-color:#f2f2f2;">
+        <th style="text-align: left; padding: 8px; border: 1px solid #ddd;">Leader</th>
+        <th style="text-align: right; padding: 8px; border: 1px solid #ddd;">Poll %</th>
+        <th style="text-align: center; padding: 8px; border: 1px solid #ddd;">Change</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;">Adam Sheridan</td>
+        <td style="padding: 8px; text-align: right; border: 1px solid #ddd;">33%</td>
+        <td style="padding: 8px; text-align: center; border: 1px solid #ddd; color: green;">▲ +2%</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;">William Walsh</td>
+        <td style="padding: 8px; text-align: right; border: 1px solid #ddd;">22%</td>
+        <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">▬ 0%</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;">Ayaan Gupta</td>
+        <td style="padding: 8px; text-align: right; border: 1px solid #ddd;">20%</td>
+        <td style="padding: 8px; text-align: center; border: 1px solid #ddd; color: green;">▲ +1%</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;">William Stevens</td>
+        <td style="padding: 8px; text-align: right; border: 1px solid #ddd;">19%</td>
+        <td style="padding: 8px; text-align: center; border: 1px solid #ddd; color: red;">▼ –1%</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;">Dan Carroll</td>
+        <td style="padding: 8px; text-align: right; border: 1px solid #ddd;">3%</td>
+        <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">▬ 0%</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;">Marcus McGloughlin</td>
+        <td style="padding: 8px; text-align: right; border: 1px solid #ddd;">2%</td>
+        <td style="padding: 8px; text-align: center; border: 1px solid #ddd; color: red;">▼ –1%</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;">Zac Cooper</td>
+        <td style="padding: 8px; text-align: right; border: 1px solid #ddd;">1%</td>
+        <td style="padding: 8px; text-align: center; border: 1px solid #ddd; color: red;">▼ –1%</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;">Cameron Leighton</td>
+        <td style="padding: 8px; text-align: right; border: 1px solid #ddd;">0%</td>
+        <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">▬ 0%</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
