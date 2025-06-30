@@ -157,6 +157,31 @@ submit = 1
   submit = 0
 }
 }
+
+window.uploadScreen = async function(){
+      document.getElementById('addsubmithere').innerHTML = `  <div id="submit" class="card p-4 shadow-sm">
+      <button class="btn btn-primary" onclick="prompt()">Copy Prompt</button>
+      <p id="success" class="text-success mt-2"></p>
+      <hr>
+    <h4 class="mb-3">Upload a response</h4>
+    <div class="mb-3">
+      <label class="form-label">Response HTML</label>
+      <textarea id="response" class="form-control" rows="3"></textarea>
+    </div>
+
+    <button class="btn btn-success" onclick="responseSubmit()">Submit</button>
+    <p id="fail" class="text-danger mt-2"></p>
+    
+  </div>`
+}
+
+window.prompt = async function(){
+fetch('mock-parliament/prompt.txt')
+  .then(res => res.text())
+  .then(text => navigator.clipboard.writeText(text));
+document.getElementById('success').innerHTML = 'Copied! Just paste this into chatgpt directly after the most recent POLLS.'
+}
+
 window.references = async function(){
         const db = await getDatabase();
       let options = ``
@@ -311,8 +336,30 @@ await update(ref(db), {
 
 }
 
+window.responseSubmit = async function() {
+  const variable = document.getElementById('response').value
+  const db = getDatabase();
+  const rf = ref(db);
+  const now = new Date();
+  const date = `${now.getDate()}${now.getMonth() + 1}`;
+
+  const amtRef = child(rf, `response/amount`);
+  const dateRef = child(rf, `response/${date}`);
+
+  try {
+    const amtSnap = await get(amtRef);
+    const newAmount = amtSnap.exists() ? amtSnap.val() + 1 : 1;
+    await update(ref(db), { "response/amount": newAmount });
+    await update(ref(db), { [`response/${date}`]: variable });
+  } catch (err) {
+    console.error(err);
+  }
+  location.reload()
+}
+
 
 async function loaddata() {
+if(window.location.pathname.endsWith("statements.html")){
   const db = await getDatabase();
   const rf = ref(db);
   const currentDate = new Date();
@@ -431,7 +478,57 @@ async function loaddata() {
   }else{
   document.getElementById('statements').innerHTML = output;
   }
+}}else if(window.location.pathname.endsWith("statementResponses.html")){
+  const db = await getDatabase();
+const rf = ref(db);
+const currentDate = new Date();
+const nerd = localStorage.getItem("nerd");
+let output = '';
+
+for (let i = 0; i < 7; i++) {
+  const dateObj = new Date(currentDate);
+  dateObj.setDate(currentDate.getDate() - i);
+  const day = dateObj.getDate();
+  const month = dateObj.getMonth() + 1;
+  const dateCode = `${day}${month}`; 
+  const snapshot = await get(child(rf, `response/${dateCode}`));
+
+  if (snapshot.exists()) {
+    const content = snapshot.val();
+    const divId = `${dateCode}`;
+    let deleteBtn = '';
+
+    if (nerd) {
+      deleteBtn = `<button class='btn btn-danger d-flex justify-content-center mb-3' onclick="deleteRes('${divId}')">Delete Response</button>`;
+    }
+
+    output += `<div id="${divId}">${content}${deleteBtn}</div><hr>`;
+  }
 }
+
+if (!output) {
+  output = 'Would You look at that! No responses within the last 7 days...';
+}
+
+document.getElementById('statements').innerHTML = output;
+
+}else{
+  console.err("Unable to load information (Can't declare loaded webpage)")
+}
+}
+
+window.deleteRes = async function(id){
+    const db = await getDatabase();
+  const rf = ref(db);
+      const snapshot = await get(child(rf, `response/amount`));
+    if (snapshot.exists()) {
+      let value = snapshot.val()
+        await update(ref(db), {
+  [`response/amount`]: value - 1
+});
+  await remove(ref(db, `response/${id}`));
+    }
+    location.reload()
 }
 
 window.doai = async function(title, month, day) {
@@ -457,9 +554,7 @@ await update(ref(db), {
 location.reload();
 }
 
-if(localStorage.getItem('nerd')){
-  document.getElementById('coolsubmitthing').innerHTML = 'Submit Statement | Edit References'
-}
 
 loaddata()
+
 
