@@ -58,13 +58,14 @@
         <li class="nav-item"><a class="nav-link" href="map.html">House of Representatives</a></li>
         <li class="nav-item"><a class="nav-link" href="senate.html">Senate</a></li>
         <li class="nav-item"><a class="nav-link" href="statements.html">Statements</a></li>
+        <li class="nav-item"><a href="statementResponses.html" class="nav-link">Statement Responses</a></li>
      </ul>
     </div>
   </nav>
 
   <div class="content" id="fade">
-    <h1 id="title">Pre-Election</h1>
-    <button id="button" class="btn btn-info" onclick="swap()">Swap to post-election</button>
+    <h1 id="title">Post-Election Polls</h1>
+    <button id="button" class="btn btn-primary" onclick="swap()">Swap to pre-election</button>
     <div id="chart-container">
       <canvas id="pollChart"></canvas>
     </div>
@@ -102,7 +103,7 @@
 
     let chart = new Chart(ctx, {
       type: 'line',
-      data: preData,
+      data: postData,
       options: {
         responsive: true,
         maintainAspectRatio: false,
