@@ -164,13 +164,26 @@ window.uploadScreen = async function(){
       <button class="btn btn-info" onclick="prompt2()">Copy Crisis / News Prompt</button>
       <p id="success" class="text-success mt-2"></p>
       <hr>
-    <h4 class="mb-3">Upload a response</h4>
+    <h4 class="mb-3">Upload a ChatGPT Response</h4>
     <div class="mb-3">
       <label class="form-label">Response HTML</label>
       <textarea id="response" class="form-control" rows="3"></textarea>
     </div>
 
     <button class="btn btn-success" onclick="responseSubmit()">Submit</button>
+    <p id="fail" class="text-danger mt-2"></p>
+    <hr>
+        <h4 class="mb-3">Upload a manual response</h4>
+            <div class="mb-3">
+      <label class="form-label">Title</label>
+      <input type="text" id="manualTitle" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Body (type [newline] for a new line)</label>
+      <textarea id="manualBody" class="form-control" rows="3"></textarea>
+    </div>
+
+    <button class="btn btn-success" onclick="newsSubmit()">Submit</button>
     <p id="fail" class="text-danger mt-2"></p>
     
   </div>`
@@ -374,6 +387,64 @@ window.responseSubmit = async function() {
   }
   location.reload()
 }
+
+function getOrdinal(n) {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+window.newsSubmit = async function() {
+  const body = document.getElementById('manualBody').value
+  const title = document.getElementById('manualTitle').value
+  const db = getDatabase();
+  const rf = ref(db);
+  const now = new Date();
+  const date = `${now.getDate()}${now.getMonth() + 1}`;
+  const month = now.toLocaleString('en-US', { month: 'long' });
+  const lengthdate = getOrdinal(now.getDate());
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+
+const ogperiod = hours >= 12 ? 'PM' : 'AM';
+const period = ogperiod.toLowerCase()
+const hour12 = hours % 12 || 12;
+const pad = n => n.toString().padStart(2, '0');
+
+  const amtRef = child(rf, `response/amount`);
+  const amtRef2 = child(rf, `response/${date}/amount`);
+
+let variable = ``
+
+if(body.includes('[newline]')){
+    const split = body.split('[newline]')
+    variable += `    <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: auto; padding: 60px 20px 20px 20px; border: 1px solid #ccc; border-radius: 8px; position: relative;">  <div class="date" id="date" style="position: absolute; top: 20px; right: 20px; font-size: 18px; color: #555;">${month} ${lengthdate} ${hour12}:${pad(minutes)}${period}</div>`
+    variable += `<h2>${title}</h2> `
+    for(let i = 0; i < split.length; i++){
+      variable += `<p>${split[i]}</p>`
+    }
+    variable += `</div>`
+}else{
+   variable += `    <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: auto; padding: 60px 20px 20px 20px; border: 1px solid #ccc; border-radius: 8px; position: relative;">  <div class="date" id="date" style="position: absolute; top: 20px; right: 20px; font-size: 18px; color: #555;">${month} ${lengthdate} ${hour12}${period}</div>`
+   variable += `<h2>${title}</div>`
+   variable += `<p>${body}</p>`
+   variable += `</div>`
+}
+
+  try {
+    const amtSnap = await get(amtRef);
+    const newAmount = amtSnap.exists() ? amtSnap.val() + 1 : 1;
+    const amtSnap2 = await get(amtRef2);
+    const newAmount2 = amtSnap2.exists() ? amtSnap2.val() + 1 : 1;
+    await update(ref(db), { "response/amount": newAmount });
+    await update(ref(db), { [`response/${date}/amount`]: newAmount2});
+    await update(ref(db), { [`response/${date}/${newAmount2}`]: variable });
+  } catch (err) {
+    console.error(err);
+  }
+  location.reload()
+}
+
 
 function escapeHtml(str) {
   return str.replace(/&/g, "")
