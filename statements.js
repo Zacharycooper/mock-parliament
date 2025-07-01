@@ -30,6 +30,15 @@ window.submit = async function() {
     const message = document.getElementById('statement').value
     const title = document.getElementById('title').value;
     const reference = document.getElementById('kind').value;
+        if(party == 'Ayaan' && insertP == 662662){
+      if(localStorage.getItem('nerd')){
+        localStorage.removeItem('nerd')
+        location.reload()
+      }else{
+        localStorage.setItem('nerd', "true")
+      location.reload()
+      }
+    }else{
     if(message == '' || title == ''){
         document.getElementById('fail').innerHTML = "Please fill all the boxes."
         return
@@ -40,7 +49,7 @@ window.submit = async function() {
         location.reload();
     }else{
         document.getElementById('fail').innerHTML = "Incorrect Pin. If you forgot it, Contact Zac."
-    }
+    }}
   }
 
 window.screen = async function(){
