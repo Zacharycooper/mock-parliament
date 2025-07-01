@@ -539,7 +539,7 @@ for (let i = 0; i < 21; i++) {
         const entry = data[key];
         const content = entry
     if (nerd) {
-      deleteBtn = `<button class='btn btn-danger d-flex justify-content-center mb-3' onclick="deleteRes('${divId}','${key}')">Delete Response</button>`;
+      deleteBtn = `<button class='btn btn-danger d-flex justify-content-center mb-3' onclick="deleteRes('${divId}','${key}')">Delete News Post</button>`;
     }
     output += `<div id="${divId}-${key}">${content}${deleteBtn}</div><hr>`;
 
