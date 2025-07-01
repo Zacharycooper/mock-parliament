@@ -160,7 +160,8 @@ submit = 1
 
 window.uploadScreen = async function(){
       document.getElementById('addsubmithere').innerHTML = `  <div id="submit" class="card p-4 shadow-sm">
-      <button class="btn btn-primary" onclick="prompt()">Copy Prompt</button>
+      <button class="btn btn-primary" onclick="prompt()">Copy Polls Prompt</button>
+      <button class="btn btn-info" onclick="prompt2()">Copy Crisis / News Prompt</button>
       <p id="success" class="text-success mt-2"></p>
       <hr>
     <h4 class="mb-3">Upload a response</h4>
@@ -180,6 +181,12 @@ fetch('prompt.txt')
   .then(res => res.text())
   .then(text => navigator.clipboard.writeText(text));
 document.getElementById('success').innerHTML = 'Copied! Just paste this into chatgpt directly after the most recent POLLS.'
+}
+window.prompt2 = async function(){
+fetch('prompt2.txt')
+  .then(res => res.text())
+  .then(text => navigator.clipboard.writeText(text));
+document.getElementById('success').innerHTML = 'Copied! Just paste this into chatgpt directly after the most recent update.'
 }
 
 window.references = async function(){
@@ -502,7 +509,7 @@ if(window.location.pathname.endsWith("statements.html")){
   }else{
   document.getElementById('statements').innerHTML = output;
   }
-}}else if(window.location.pathname.endsWith("statementResponses.html")){
+}}else if(window.location.pathname.endsWith("news.html")){
   const db = await getDatabase();
 const rf = ref(db);
 const currentDate = new Date();
