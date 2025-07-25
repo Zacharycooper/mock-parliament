@@ -72,6 +72,7 @@ window.screen = async function(){
         <option value="Stevens">Will Stevens</option>
         <option value="Ayaan">Ayaan Gupta</option>
         <option value="Zac">Zachary Cooper</option>
+        <option value="Xavier">Xavier Ong</option>
       </select>
     </div>
 
